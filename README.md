@@ -27,7 +27,7 @@ apps/
   web/        React εφαρμογή (src/features/{tasks,settings,categories,widget,auth}) + Playwright e2e
 packages/
   contracts/  openapi.yaml + παραγόμενος κώδικας (μην τον αλλάζετε με το χέρι: pnpm codegen)
-  db/         Drizzle schema, migrations, εισαγωγή παλιών δεδομένων από το Replit
+  db/         Drizzle schema, migrations
   domain/     Καθαρή λογική (ημερομηνίες/ζώνες ώρας, δέντρο εργασιών) + unit tests
 scripts/      build για Vercel, init script για τοπική Postgres
 ```

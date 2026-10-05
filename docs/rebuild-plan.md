@@ -177,12 +177,12 @@ task-planner/
 | 7 | **Categories & Settings**: CRUD, color picker, preferences | ίδια ροή |
 | 8 | **Widget preview** | ίδια εμφάνιση |
 | 9 | **E2E**: μεταφορά Playwright specs (`task-composer.spec.ts`, real-clerk) | e2e πράσινο |
-| 10 | **Data migration** από τη Replit Postgres: `pg_dump --data-only` → import, και επαλήθευση counts | ίδια δεδομένα ανά χρήστη |
-| 11 | **Deploy** (π.χ. Fly/Render/Railway για API, Vercel/Netlify για web, Neon/Supabase Postgres) | production URL |
+| 10 | **Deploy** (π.χ. Fly/Render/Railway για API, Vercel/Netlify για web, Neon/Supabase Postgres) | production URL |
 
 ---
 
 ## 5. Αποφάσεις (εγκρίθηκαν)
+0. **Δεδομένα**: δεν μεταφέρονται από το Replit· οι εργασίες θα ξαναπεραστούν με το χέρι στη νέα εφαρμογή.
 1. **Bugs της §2**: διορθώθηκαν όλα· η ροή χρήστη μένει ίδια. Κάθε διόρθωση έχει test.
 2. **Auth**: παραμένει το Clerk. Το Replit Clerk proxy αφαιρέθηκε και τα αιτήματα στέλνουν `Authorization: Bearer`.
 3. **Διακόπτες widget/reminders**: μένουν ανά συσκευή (localStorage, ίδια keys) αλλά πλέον **λειτουργούν**:
@@ -222,8 +222,7 @@ task-planner/
 | 4 | `apps/api` + integration tests (απομόνωση, tasks, categories, summaries) | ✅ |
 | 5–8 | `apps/web`: shell, tasks, composer, settings, widget | ✅ |
 | 9 | E2E: τα 14 αρχικά σενάρια του Replit + 9 νέα για τα bugs | ✅ |
-| 10 | Script μεταφοράς δεδομένων από το Replit (`pnpm db:import-legacy`) | ✅ |
-| 11 | Deploy: build για Vercel έτοιμο· μένει η σύνδεση λογαριασμών (βλ. [`deploy.md`](deploy.md)) | ⏳ |
+| 10 | Deploy: build για Vercel έτοιμο· μένει η σύνδεση λογαριασμών (βλ. [`deploy.md`](deploy.md)) | ⏳ |
 
 Επιπλέον βελτιώσεις, χωρίς αλλαγή στη ροή χρήστη:
 - επιβεβαιώσεις με dialog αντί για `window.confirm`·

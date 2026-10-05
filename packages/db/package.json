@@ -5,14 +5,12 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./migrate": "./src/migrate.ts",
-    "./import-legacy": "./src/import-legacy.ts"
+    "./migrate": "./src/migrate.ts"
   },
   "scripts": {
     "generate": "drizzle-kit generate",
     "migrate": "tsx --env-file-if-exists=../../.env src/migrate.ts",
-    "typecheck": "tsc --noEmit",
-    "import-legacy": "tsx --env-file-if-exists=../../.env src/import-legacy.ts"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.0",
