@@ -18,7 +18,8 @@
     "test:e2e": "pnpm --filter @tasknest/web test:e2e",
     "codegen": "pnpm --filter @tasknest/contracts codegen",
     "db:generate": "pnpm --filter @tasknest/db generate",
-    "db:migrate": "pnpm --filter @tasknest/db migrate"
+    "db:migrate": "pnpm --filter @tasknest/db migrate",
+    "db:import-legacy": "pnpm --filter @tasknest/db import-legacy"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.0",

@@ -1,7 +1,7 @@
 // Bundles the API into a single Node file (no workspace/TS resolution needed at runtime).
 import { build } from 'esbuild';
 
-export async function bundleApi({ entry, outfile }) {
+export async function bundleApi({ entry, outfile, footer }) {
   await build({
     entryPoints: [entry],
     outfile,
@@ -13,6 +13,7 @@ export async function bundleApi({ entry, outfile }) {
     // Optional native binding that pg tries to load; not used.
     external: ['pg-native'],
     logLevel: 'warning',
+    ...(footer ? { footer: { js: footer } } : {}),
   });
 }
 

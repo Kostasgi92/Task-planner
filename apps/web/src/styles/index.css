@@ -1,0 +1,127 @@
+/* TaskNest design tokens — ported 1:1 from the original app (light theme). */
+@layer theme, base, clerk, components, utilities;
+@import 'tailwindcss';
+@import '@clerk/themes/shadcn.css';
+@import 'tw-animate-css';
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-sidebar: hsl(var(--sidebar));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+
+  --font-sans: 'Manrope', sans-serif;
+  --font-serif: 'Newsreader', serif;
+  --font-mono: 'DM Mono', monospace;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --background: 39 35% 94%;
+  --foreground: 215 27% 19%;
+  --border: 37 22% 83%;
+  --card: 40 42% 97%;
+  --card-foreground: 215 27% 19%;
+  --popover: 40 42% 97%;
+  --popover-foreground: 215 27% 19%;
+  --primary: 218 27% 24%;
+  --primary-foreground: 40 42% 97%;
+  --secondary: 43 91% 66%;
+  --secondary-foreground: 218 27% 24%;
+  --muted: 39 24% 89%;
+  --muted-foreground: 215 12% 47%;
+  --accent: 156 28% 77%;
+  --accent-foreground: 160 31% 23%;
+  --destructive: 2 64% 50%;
+  --destructive-foreground: 40 42% 97%;
+  --input: 37 22% 83%;
+  --ring: 43 91% 55%;
+  --sidebar: 218 27% 24%;
+  --sidebar-foreground: 39 35% 94%;
+  --sidebar-border: 218 22% 32%;
+  --sidebar-primary: 43 91% 66%;
+  --sidebar-primary-foreground: 218 27% 24%;
+  --sidebar-accent: 217 22% 31%;
+  --sidebar-accent-foreground: 39 35% 94%;
+  --radius: 1.15rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply font-sans antialiased text-foreground;
+    min-width: 320px;
+    background:
+      radial-gradient(circle at 88% 0%, hsl(43 91% 66% / 0.13), transparent 25rem),
+      hsl(var(--background));
+  }
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@keyframes tasknest-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.tasknest-rise {
+  animation: tasknest-rise 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.tasknest-grain::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.025;
+  z-index: 50;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 140 140' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.65'/%3E%3C/svg%3E");
+}
+.safe-bottom {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+@media (prefers-reduced-motion: reduce) {
+  .tasknest-rise {
+    animation: none;
+  }
+}
