@@ -1,0 +1,442 @@
+openapi: 3.1.0
+info:
+  title: TaskNest API
+  version: 1.0.0
+  description: |
+    TaskNest REST API. Every endpoint except /healthz requires a Clerk session
+    (`Authorization: Bearer <session token>`). All data is private to the signed-in user.
+
+    Clients may send `X-Timezone: <IANA zone>` (e.g. `Europe/Athens`); "today" in task
+    filters and summaries is then computed in that zone. Defaults to UTC.
+servers:
+  - url: /api
+tags:
+  - name: health
+  - name: categories
+  - name: tasks
+  - name: summaries
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      security: []
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /categories:
+    get:
+      operationId: listCategories
+      tags: [categories]
+      summary: List categories (creates "Personal" on first use)
+      responses:
+        "200":
+          description: Categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+    post:
+      operationId: createCategory
+      tags: [categories]
+      summary: Create a category
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryInput"
+      responses:
+        "201":
+          description: Created category
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /categories/{id}:
+    patch:
+      operationId: updateCategory
+      tags: [categories]
+      summary: Rename or recolor a category
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryUpdate"
+      responses:
+        "200":
+          description: Updated category
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      operationId: deleteCategory
+      tags: [categories]
+      summary: Delete a category and its tasks
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "204":
+          description: Category deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /tasks:
+    get:
+      operationId: listTasks
+      tags: [tasks]
+      summary: List tasks and subtasks
+      parameters:
+        - in: query
+          name: categoryId
+          schema:
+            type: integer
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [active, completed, all]
+        - in: query
+          name: due
+          schema:
+            type: string
+            enum: [today, upcoming, all]
+      responses:
+        "200":
+          description: Tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+    post:
+      operationId: createTask
+      tags: [tasks]
+      summary: Create a task or subtask
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskInput"
+      responses:
+        "201":
+          description: Created task
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /tasks/completed:
+    delete:
+      operationId: clearCompletedTasks
+      tags: [tasks]
+      summary: Remove all completed tasks
+      description: |
+        Deletes completed tasks (optionally only in one category). Unfinished subtasks of a
+        removed task are kept and become top-level tasks.
+      parameters:
+        - in: query
+          name: categoryId
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Completed tasks removed
+  /tasks/{id}:
+    patch:
+      operationId: updateTask
+      tags: [tasks]
+      summary: Update a task
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskUpdate"
+      responses:
+        "200":
+          description: Updated task
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      operationId: deleteTask
+      tags: [tasks]
+      summary: Delete a task and its subtasks
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "204":
+          description: Task deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /summaries/dashboard:
+    get:
+      operationId: getDashboardSummary
+      tags: [summaries]
+      summary: Get dashboard counts
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+  /summaries/widget:
+    get:
+      operationId: getWidgetSummary
+      tags: [summaries]
+      summary: Get a compact today view for a home-screen widget
+      parameters:
+        - in: query
+          name: categoryId
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Widget summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WidgetSummary"
+components:
+  securitySchemes:
+    clerkSession:
+      type: http
+      scheme: bearer
+  parameters:
+    Id:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+  responses:
+    BadRequest:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: Not found (or not yours)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+    HealthStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+    Category:
+      type: object
+      required: [id, name, color, taskCount, completedCount]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        color:
+          type: string
+        taskCount:
+          type: integer
+        completedCount:
+          type: integer
+    CategoryInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 60
+        color:
+          $ref: "#/components/schemas/HexColor"
+    CategoryUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 60
+        color:
+          $ref: "#/components/schemas/HexColor"
+    HexColor:
+      type: string
+      pattern: "^#[0-9a-fA-F]{6}$"
+    Importance:
+      type: string
+      enum: [low, medium, high]
+    Task:
+      type: object
+      required: [id, categoryId, parentId, title, notes, bulletPoints, bulletPointCompleted, importance, dueAt, reminderAt, completed, createdAt, completedAt]
+      properties:
+        id:
+          type: integer
+        categoryId:
+          type: integer
+        parentId:
+          type: [integer, "null"]
+        title:
+          type: string
+        notes:
+          type: [string, "null"]
+        bulletPoints:
+          type: array
+          items:
+            type: string
+        bulletPointCompleted:
+          type: array
+          items:
+            type: boolean
+        importance:
+          $ref: "#/components/schemas/Importance"
+        dueAt:
+          type: [string, "null"]
+          format: date-time
+        reminderAt:
+          type: [string, "null"]
+          format: date-time
+        completed:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: [string, "null"]
+          format: date-time
+    TaskInput:
+      type: object
+      required: [categoryId, title]
+      properties:
+        categoryId:
+          type: integer
+        parentId:
+          type: [integer, "null"]
+        title:
+          type: string
+          minLength: 1
+          maxLength: 300
+        notes:
+          type: [string, "null"]
+          maxLength: 5000
+        bulletPoints:
+          type: array
+          maxItems: 100
+          items:
+            type: string
+            maxLength: 500
+        bulletPointCompleted:
+          type: array
+          maxItems: 100
+          items:
+            type: boolean
+        importance:
+          $ref: "#/components/schemas/Importance"
+        dueAt:
+          type: [string, "null"]
+          format: date-time
+        reminderAt:
+          type: [string, "null"]
+          format: date-time
+    TaskUpdate:
+      type: object
+      properties:
+        categoryId:
+          type: integer
+        parentId:
+          type: [integer, "null"]
+        title:
+          type: string
+          minLength: 1
+          maxLength: 300
+        notes:
+          type: [string, "null"]
+          maxLength: 5000
+        bulletPoints:
+          type: array
+          maxItems: 100
+          items:
+            type: string
+            maxLength: 500
+        bulletPointCompleted:
+          type: array
+          maxItems: 100
+          items:
+            type: boolean
+        importance:
+          $ref: "#/components/schemas/Importance"
+        dueAt:
+          type: [string, "null"]
+          format: date-time
+        reminderAt:
+          type: [string, "null"]
+          format: date-time
+        completed:
+          type: boolean
+    DashboardSummary:
+      type: object
+      required: [activeCount, completedCount, dueTodayCount, overdueCount, categoryCount]
+      properties:
+        activeCount:
+          type: integer
+        completedCount:
+          type: integer
+        dueTodayCount:
+          type: integer
+        overdueCount:
+          type: integer
+        categoryCount:
+          type: integer
+    WidgetSummary:
+      type: object
+      required: [dateLabel, activeCount, dueTodayCount, tasks]
+      properties:
+        dateLabel:
+          type: string
+        activeCount:
+          type: integer
+        dueTodayCount:
+          type: integer
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/Task"
+security:
+  - clerkSession: []

@@ -1,0 +1,27 @@
+{
+  "name": "tasknest",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @tasknest/api --filter @tasknest/web dev",
+    "build": "pnpm --filter @tasknest/web build && pnpm --filter @tasknest/api build",
+    "build:vercel": "node scripts/build-vercel.mjs",
+    "vercel-build": "pnpm db:migrate && pnpm build:vercel",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "test": "pnpm -r test",
+    "test:e2e": "pnpm --filter @tasknest/web test:e2e",
+    "codegen": "pnpm --filter @tasknest/contracts codegen",
+    "db:generate": "pnpm --filter @tasknest/db generate",
+    "db:migrate": "pnpm --filter @tasknest/db migrate"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.0",
+    "typescript": "~5.9.3"
+  }
+}

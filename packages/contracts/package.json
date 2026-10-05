@@ -1,0 +1,27 @@
+{
+  "name": "@tasknest/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./zod": "./src/zod.ts",
+    "./client": "./src/client.ts"
+  },
+  "scripts": {
+    "codegen": "orval --config ./orval.config.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.1.0"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "^5.0.0",
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@tanstack/react-query": "^5.90.0",
+    "@types/react": "^19.0.0",
+    "orval": "^8.0.0",
+    "react": "^19.0.0"
+  }
+}
